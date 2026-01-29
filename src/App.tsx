@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import ReactECharts from 'echarts-for-react'
 import * as XLSX from 'xlsx'
 import type { FilterState, ProgramRow } from './types'
@@ -19,6 +19,8 @@ const DEFAULT_FILTERS: FilterState = {
   search: '',
   hideBlankMajor: false,
 }
+
+const LOCAL_STORAGE_KEY = 'bambangProgramsDashboard:lastUpload'
 
 function validateHeaders(headers: string[]): string | null {
   const trimmed = headers.map((h) => h.trim())
@@ -386,6 +388,22 @@ export function App() {
     }
   }, [filteredRows])
 
+  // Load last saved upload from localStorage on first mount
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(LOCAL_STORAGE_KEY)
+      if (!raw) return
+      const parsed = JSON.parse(raw) as LoadedData
+      if (!parsed || !Array.isArray(parsed.raw)) return
+      const bambang = parsed.raw.filter((r) => r.Campus.trim().toLowerCase() === 'bambang')
+      const removedNonBambangCount = parsed.raw.length - bambang.length
+      setLoaded({ raw: parsed.raw, bambang, removedNonBambangCount })
+    } catch {
+      // If anything goes wrong, just ignore and start clean
+      window.localStorage.removeItem(LOCAL_STORAGE_KEY)
+    }
+  }, [])
+
   async function onFileSelected(file: File | null) {
     setError(null)
     if (!file) return
@@ -393,8 +411,14 @@ export function App() {
       const raw = await parseXlsxFirstSheet(file)
       const bambang = raw.filter((r) => r.Campus.trim().toLowerCase() === 'bambang')
       const removedNonBambangCount = raw.length - bambang.length
-      setLoaded({ raw, bambang, removedNonBambangCount })
+      const nextLoaded: LoadedData = { raw, bambang, removedNonBambangCount }
+      setLoaded(nextLoaded)
       setFilters(DEFAULT_FILTERS)
+      // Save the latest upload so it auto-loads next time
+      window.localStorage.setItem(
+        LOCAL_STORAGE_KEY,
+        JSON.stringify({ raw: nextLoaded.raw, bambang: nextLoaded.bambang, removedNonBambangCount }),
+      )
     } catch (e) {
       setLoaded(null)
       setError(e instanceof Error ? e.message : String(e))
@@ -462,13 +486,30 @@ export function App() {
         <aside className="panel">
           <div className="panelHeader">
             <h2>Filters</h2>
-            <button className="btn" onClick={() => setFilters(DEFAULT_FILTERS)}>
-              Reset
-            </button>
+            <div style={{ display: 'flex', gap: 6 }}>
+              <button className="btn" onClick={() => setFilters(DEFAULT_FILTERS)}>
+                Reset
+              </button>
+              <button
+                className="btn"
+                type="button"
+                onClick={() => {
+                  setLoaded(null)
+                  setFilters(DEFAULT_FILTERS)
+                  window.localStorage.removeItem(LOCAL_STORAGE_KEY)
+                }}
+                disabled={!loaded}
+              >
+                Clear saved
+              </button>
+            </div>
           </div>
           <div className="panelBody">
             {!loaded ? (
-              <div className="hint">Upload an `.xlsx` file to begin. (We always show Campus = Bambang.)</div>
+              <div className="hint">
+                Upload an `.xlsx` file to begin. (We always show Campus = Bambang.) Last upload will auto‑load in this
+                browser.
+              </div>
             ) : (
               <>
                 <div className="hint" style={{ marginBottom: 10 }}>

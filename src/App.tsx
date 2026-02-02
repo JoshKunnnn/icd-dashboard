@@ -581,7 +581,7 @@ export function App() {
               <div className="hint">Stacked counts</div>
             </div>
             <div className="panelBody">
-              <ReactECharts option={copcByCollegeOption} style={{ height: 420 }} notMerge lazyUpdate />
+              <ReactECharts option={copcByCollegeOption} style={{ height: 420, width: '100%' }} notMerge lazyUpdate />
             </div>
           </section>
 
@@ -591,7 +591,7 @@ export function App() {
                 <h2>Offerings breadth: College × Level</h2>
               </div>
               <div className="panelBody">
-                <ReactECharts option={offeringsByCollegeLevelOption} style={{ height: 400 }} notMerge lazyUpdate />
+                <ReactECharts option={offeringsByCollegeLevelOption} style={{ height: 400, width: '100%' }} notMerge lazyUpdate />
               </div>
             </div>
             <div className="panel">
@@ -599,7 +599,7 @@ export function App() {
                 <h2>Quality: Accreditation distribution</h2>
               </div>
               <div className="panelBody">
-                <ReactECharts option={accreditationDistOption} style={{ height: 400 }} notMerge lazyUpdate />
+                <ReactECharts option={accreditationDistOption} style={{ height: 400, width: '100%' }} notMerge lazyUpdate />
               </div>
             </div>
           </section>
@@ -609,7 +609,7 @@ export function App() {
               <h2>Quality: College × Accreditation</h2>
             </div>
             <div className="panelBody">
-              <ReactECharts option={accreditationStackedOption} style={{ height: 500 }} notMerge lazyUpdate />
+              <ReactECharts option={accreditationStackedOption} style={{ height: 500, width: '100%' }} notMerge lazyUpdate />
             </div>
           </section>
 

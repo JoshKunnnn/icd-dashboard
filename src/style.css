@@ -91,6 +91,19 @@ select {
   display: grid;
   grid-template-columns: 320px 1fr;
   gap: 16px;
+  overflow: hidden;
+}
+
+.contentGrid>aside {
+  min-width: 320px;
+  width: 320px;
+  flex-shrink: 0;
+}
+
+.contentGrid>main {
+  min-width: 0;
+  width: 100%;
+  overflow: hidden;
 }
 
 .panel {
@@ -117,6 +130,8 @@ select {
 
 .panelBody {
   padding: 12px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .btn {
@@ -325,9 +340,11 @@ tr:hover td {
   .contentGrid {
     grid-template-columns: 1fr;
   }
+
   .kpis {
     grid-template-columns: repeat(2, minmax(160px, 1fr));
   }
+
   .chartsGrid2,
   .chartsGrid3 {
     grid-template-columns: 1fr;

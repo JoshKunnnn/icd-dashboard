@@ -196,17 +196,17 @@ export function App() {
       const counts = colleges.map(
         (c) => filteredRows.filter((r) => r.College === c && r['COPC Status'] === s).length,
       )
-      return { name: s, type: 'bar', stack: 'status', emphasis: { focus: 'series' }, data: counts }
+      return { name: s, type: 'bar', emphasis: { focus: 'series' }, data: counts }
     })
     return {
       backgroundColor: 'transparent',
       tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
       legend: { textStyle: { color: 'rgba(255,255,255,0.8)' } },
-      grid: { left: 20, right: 20, top: 40, bottom: 60, containLabel: true },
+      grid: { left: '3%', right: '4%', bottom: '10%', top: '15%', containLabel: true },
       xAxis: {
         type: 'category',
         data: colleges,
-        axisLabel: { color: 'rgba(255,255,255,0.7)', rotate: 20 },
+        axisLabel: { color: 'rgba(255,255,255,0.7)', rotate: 15 },
         axisLine: { lineStyle: { color: 'rgba(255,255,255,0.15)' } },
       },
       yAxis: {
@@ -224,18 +224,17 @@ export function App() {
     const series = levels.map((lvl) => ({
       name: lvl,
       type: 'bar',
-      stack: 'level',
       data: colleges.map((c) => filteredRows.filter((r) => r.College === c && r.Level === lvl).length),
     }))
     return {
       backgroundColor: 'transparent',
       tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
       legend: { textStyle: { color: 'rgba(255,255,255,0.8)' } },
-      grid: { left: 20, right: 20, top: 40, bottom: 60, containLabel: true },
+      grid: { left: '3%', right: '4%', bottom: '10%', top: '15%', containLabel: true },
       xAxis: {
         type: 'category',
         data: colleges,
-        axisLabel: { color: 'rgba(255,255,255,0.7)', rotate: 20 },
+        axisLabel: { color: 'rgba(255,255,255,0.7)', rotate: 15 },
         axisLine: { lineStyle: { color: 'rgba(255,255,255,0.15)' } },
       },
       yAxis: {
@@ -273,16 +272,16 @@ export function App() {
     return {
       backgroundColor: 'transparent',
       tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
-      grid: { left: 24, right: 24, top: 20, bottom: 76, containLabel: true },
+      grid: { left: '3%', right: '4%', bottom: '10%', top: '15%', containLabel: true },
       xAxis: {
         type: 'category',
         data: accs,
         axisLabel: {
           color: 'rgba(255,255,255,0.75)',
-          rotate: 25,
+          rotate: 30,
           margin: 14,
           interval: 0,
-          formatter: (v: string) => wrapAxisLabel(v, 12),
+          formatter: (v: string) => wrapAxisLabel(v, 14),
         },
         axisLine: { lineStyle: { color: 'rgba(255,255,255,0.15)' } },
       },
@@ -301,90 +300,40 @@ export function App() {
     }
   }, [filteredRows])
 
-  const accreditationHeatmapOption = useMemo(() => {
-    const wrapAxisLabel = (label: string, maxLineLen = 12): string => {
-      const s = (label ?? '').trim()
-      if (!s) return ''
-      if (s.length <= maxLineLen) return s
-      const parts = s.split(/\s+/).filter(Boolean)
-      const lines: string[] = []
-      let line = ''
-      for (const p of parts) {
-        const next = line ? `${line} ${p}` : p
-        if (next.length > maxLineLen && line) {
-          lines.push(line)
-          line = p
-        } else {
-          line = next
-        }
-      }
-      if (line) lines.push(line)
-      return lines.slice(0, 3).join('\n')
-    }
-
+  const accreditationStackedOption = useMemo(() => {
     const colleges = uniqSorted(filteredRows.map((r) => r.College))
     const accs = uniqSorted(filteredRows.map((r) => r.AccreditationNormalized))
-    const data: [number, number, number][] = []
-    colleges.forEach((c, i) => {
-      accs.forEach((a, j) => {
-        const v = filteredRows.filter((r) => r.College === c && r.AccreditationNormalized === a).length
-        data.push([j, i, v])
-      })
-    })
-    const max = Math.max(1, ...data.map((d) => d[2]))
+
+    const series = accs.map((acc) => ({
+      name: acc,
+      type: 'bar',
+      emphasis: { focus: 'series' },
+      data: colleges.map(
+        (c) => filteredRows.filter((r) => r.College === c && r.AccreditationNormalized === acc).length,
+      ),
+    }))
+
     return {
       backgroundColor: 'transparent',
-      tooltip: {
-        position: 'top',
-        formatter: (p: { value: [number, number, number] }) => {
-          const [x, y, v] = p.value
-          return `${colleges[y]} • ${accs[x]}: <b>${v}</b>`
-        },
+      tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+      legend: {
+        textStyle: { color: 'rgba(255,255,255,0.8)' },
+        type: 'scroll',
+        pageTextStyle: { color: '#fff' },
       },
-      grid: { left: 96, right: 24, top: 18, bottom: 86 },
+      grid: { left: '3%', right: '4%', bottom: '15%', top: '15%', containLabel: true },
       xAxis: {
         type: 'category',
-        data: accs,
-        splitArea: { show: true, areaStyle: { color: ['rgba(255,255,255,0.03)', 'rgba(255,255,255,0.01)'] } },
-        axisLabel: {
-          color: 'rgba(255,255,255,0.75)',
-          rotate: 25,
-          margin: 14,
-          formatter: (v: string) => wrapAxisLabel(v, 12),
-        },
+        data: colleges,
+        axisLabel: { color: 'rgba(255,255,255,0.7)', rotate: 20 },
         axisLine: { lineStyle: { color: 'rgba(255,255,255,0.15)' } },
       },
       yAxis: {
-        type: 'category',
-        data: colleges,
-        splitArea: { show: true, areaStyle: { color: ['rgba(255,255,255,0.03)', 'rgba(255,255,255,0.01)'] } },
-        axisLabel: { color: 'rgba(255,255,255,0.75)', margin: 12 },
-        axisLine: { lineStyle: { color: 'rgba(255,255,255,0.15)' } },
+        type: 'value',
+        axisLabel: { color: 'rgba(255,255,255,0.7)' },
+        splitLine: { lineStyle: { color: 'rgba(255,255,255,0.08)' } },
       },
-      visualMap: {
-        min: 0,
-        max,
-        calculable: true,
-        orient: 'horizontal',
-        left: 'center',
-        bottom: 10,
-        textStyle: { color: 'rgba(255,255,255,0.7)' },
-        inRange: { color: ['rgba(255,255,255,0.08)', 'rgba(124, 92, 255, 0.85)'] },
-      },
-      series: [
-        {
-          name: 'Count',
-          type: 'heatmap',
-          data,
-          label: { show: true, color: 'rgba(255,255,255,0.85)' },
-          emphasis: {
-            itemStyle: {
-              shadowBlur: 10,
-              shadowColor: 'rgba(0, 0, 0, 0.4)',
-            },
-          },
-        },
-      ],
+      series,
     }
   }, [filteredRows])
 
@@ -632,7 +581,7 @@ export function App() {
               <div className="hint">Stacked counts</div>
             </div>
             <div className="panelBody">
-              <ReactECharts option={copcByCollegeOption} style={{ height: 380 }} notMerge lazyUpdate />
+              <ReactECharts option={copcByCollegeOption} style={{ height: 420 }} notMerge lazyUpdate />
             </div>
           </section>
 
@@ -642,7 +591,7 @@ export function App() {
                 <h2>Offerings breadth: College × Level</h2>
               </div>
               <div className="panelBody">
-                <ReactECharts option={offeringsByCollegeLevelOption} style={{ height: 340 }} notMerge lazyUpdate />
+                <ReactECharts option={offeringsByCollegeLevelOption} style={{ height: 400 }} notMerge lazyUpdate />
               </div>
             </div>
             <div className="panel">
@@ -650,17 +599,17 @@ export function App() {
                 <h2>Quality: Accreditation distribution</h2>
               </div>
               <div className="panelBody">
-                <ReactECharts option={accreditationDistOption} style={{ height: 340 }} notMerge lazyUpdate />
+                <ReactECharts option={accreditationDistOption} style={{ height: 400 }} notMerge lazyUpdate />
               </div>
             </div>
           </section>
 
           <section className="panel">
             <div className="panelHeader">
-              <h2>Quality: College × Accreditation (heatmap)</h2>
+              <h2>Quality: College × Accreditation</h2>
             </div>
             <div className="panelBody">
-              <ReactECharts option={accreditationHeatmapOption} style={{ height: 420 }} notMerge lazyUpdate />
+              <ReactECharts option={accreditationStackedOption} style={{ height: 500 }} notMerge lazyUpdate />
             </div>
           </section>
 

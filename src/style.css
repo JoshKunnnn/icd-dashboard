@@ -85,7 +85,7 @@ select {
 }
 
 .contentGrid {
-  max-width: 1300px;
+  max-width: 1800px;
   margin: 0 auto;
   padding: 16px 18px 30px;
   display: grid;
@@ -174,7 +174,7 @@ select {
 
 .chartsGrid2 {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
 
